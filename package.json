@@ -1,6 +1,6 @@
 {
   "name": "ypo-lexer-ypo",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Lexer for the YPO plain text alternative i18next file format",
   "keywords": [
     "ypo",
