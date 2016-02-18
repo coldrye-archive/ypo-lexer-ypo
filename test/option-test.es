@@ -16,37 +16,27 @@
  */
 
 
-import assert from 'esaver';
+import * as option from 'ypo-parser-common/directives/option';
 
-import {OPTION} from '../src/constants';
-
-import {
-    DIRECTIVE_OPTION, OPTION_LANG, OPTION_NS, OPTION_PLURAL
-} from 'ypo-parser-common/constants';
-import * as option from 'ypo-parser-common/option';
-import ParseError from 'ypo-parser-common/exceptions';
-
-import * as fixtures from './fixtures';
+import {RULE_OPTION} from '../src/rules';
 
 
-describe('OPTION production rule',
+describe('RULE_OPTION production rule',
 function ()
 {
-    const testcases = [
-        {key:OPTION_LANG, value:'en'},
-        {key:OPTION_LANG, value:'en-US'},
-        {key:OPTION_NS, value:'ns'},
-        {key:OPTION_NS, value:'camelCaSe'},
-        {key:OPTION_PLURAL, value:undefined},
-        {key:OPTION_PLURAL, value:'5'}
-    ];
+    const rule = RULE_OPTION;
 
-    const rule = OPTION;
+    const testcases = [
+        {key:option.OPTION_LANG, value:'en'},
+        {key:option.OPTION_LANG, value:'en-US'},
+        {key:option.OPTION_NS, value:'ns'},
+        {key:option.OPTION_NS, value:'camelCaSe'}
+    ];
 
     it('#groups must have the correct value',
     function ()
     {
-        assert.deepEqual(rule.groups, ['key', 'value']);
+        rule.groups.should.deep.equal(['key', 'value']);
     });
 
     describe('#regex',
@@ -73,25 +63,25 @@ function basicOptionRegexpTests(regexp, fields, withLeadingSpace = true)
         it('must have a match',
         function ()
         {
-            assert.ok(match);
+            should.exist(match);
         });
 
         it('must have 2 match groups',
         function ()
         {
-            assert.equal(match.length - 1, 2);
+            match.length.should.equal(3);
         });
 
         it('key group must have the correct value',
         function ()
         {
-            assert.equal(normalizeValue(match[1]), key);
+            match[1].should.equal(key);
         });
 
         it('value group must have the correct value',
         function ()
         {
-            assert.equal(normalizeValue(match[2]), value);
+            match[2].should.equal(value);
         });
     });
 }
@@ -107,12 +97,6 @@ function buildDirective(withLeadingSpace, {key, value})
 function buildDescription(withLeadingSpace, {key, value})
 {
     return 'must match "#=' + (withLeadingSpace ? ' ' : '')
-           + key + (value ? ' "' + value + '"' : '') + '"';
-}
-
-
-function normalizeValue(value)
-{
-    return value == '' ? undefined : value;
+           + key + (value ? ' ' + value : '');
 }
 

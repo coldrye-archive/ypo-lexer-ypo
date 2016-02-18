@@ -16,22 +16,20 @@
  */
 
 
-import assert from 'esaver';
-
-import {TRANSLATION_ID} from '../src/constants';
+import {RULE_TRANSLATION_ID} from '../src/rules';
 
 import * as fixtures from './fixtures';
 
 
-describe('TRANSLATION_ID production rule',
+describe('RULE_TRANSLATION_ID production rule',
 function ()
 {
-    const rule = TRANSLATION_ID;
+    const rule = RULE_TRANSLATION_ID;
 
     it('#groups must have the correct value',
     function ()
     {
-        assert.deepEqual(['id'], rule.groups);
+        rule.groups.should.deep.equal(['value']);
     });
 
     describe('#regex',
@@ -40,33 +38,33 @@ function ()
         it('must match simple id',
         function ()
         {
-            assert.ok(rule.regex.test(fixtures.TID));
+            rule.regex.test(fixtures.TID).should.be.ok;
         });
 
         it('must match simple id w/o whitespace',
         function ()
         {
-            assert.ok(rule.regex.test(fixtures.TID_NO_WS));
+            rule.regex.test(fixtures.TID_NO_WS).should.be.ok;
         });
 
-        it('must match complex id',
+        it('must not match complex id',
         function ()
         {
-            assert.ok(rule.regex.test(fixtures.TID_COMPLEX));
+            rule.regex.test(fixtures.TID_COMPLEX).should.not.be.ok;
         });
 
         it('must not match invalid id',
         function ()
         {
-            assert.ok(!rule.regex.test(fixtures.TID_INVALID));
+            rule.regex.test(fixtures.TID_INVALID).should.not.be.ok;
         });
 
         it('must have the expected groups',
         function ()
         {
             const matches = rule.regex.exec(fixtures.TID);
-            assert.equal(2, matches.length);
-            assert.equal(fixtures.TEST_ID, matches[1]);
+            matches.length.should.equal(2);
+            matches[1].should.equal(fixtures.TEST_ID);
         });
     });
 });

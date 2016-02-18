@@ -16,9 +16,7 @@
  */
 
 
-import assert from 'esaver';
-
-import {TEXT} from '../src/constants';
+import {RULE_TEXT} from '../src/rules';
 
 import * as fixtures from './fixtures';
 
@@ -26,12 +24,12 @@ import * as fixtures from './fixtures';
 describe('TEXT production rule',
 function ()
 {
-    const rule = TEXT;
+    const rule = RULE_TEXT;
 
     it('#groups must have the correct value',
     function ()
     {
-        assert.deepEqual(['text'], rule.groups);
+        rule.groups.should.deep.equal(['value']);
     });
 
     describe('#regex',
@@ -69,7 +67,14 @@ function basicRegexpTests(rule, tc, mustMatch = true)
         it('must ' + (mustMatch ? '' : 'not ') + 'match',
         function ()
         {
-            assert.ok(mustMatch ? matches : !matches);
+            if (mustMatch)
+            {
+                matches.should.be.ok;
+            }
+            else
+            {
+                should.not.exist(matches);
+            }
         });
 
         if (mustMatch)
@@ -77,13 +82,13 @@ function basicRegexpTests(rule, tc, mustMatch = true)
             it('must have the expected number of match groups',
             function ()
             {
-                assert.equal(matches.length, rule.groups.length + 1);
+                matches.length.should.equal(rule.groups.length + 1);
             });
 
             it('match must be equal to input',
             function ()
             {
-                assert.equal(matches[1], tc);
+                matches[1].should.equal(tc);
             });
         }
     });

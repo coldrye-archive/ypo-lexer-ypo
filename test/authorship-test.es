@@ -16,9 +16,7 @@
  */
 
 
-import assert from 'esaver';
-
-import {AUTHORSHIP} from '../src/constants';
+import {RULE_AUTHORSHIP} from '../src/rules';
 
 import * as fixtures from './fixtures';
 
@@ -26,12 +24,12 @@ import * as fixtures from './fixtures';
 describe('AUTHORSHIP production rule',
 function ()
 {
-    const rule = AUTHORSHIP;
+    const rule = RULE_AUTHORSHIP;
 
     it('#groups must have the correct value',
     function ()
     {
-        assert.deepEqual(['name', 'alias', 'email', 'url'], rule.groups);
+        rule.groups.should.deep.equal(['name', 'alias', 'email', 'url']);
     });
 
     describe('#regex',
@@ -72,13 +70,13 @@ function ()
         it('must not match malformed author info',
         function ()
         {
-            assert.ok(!rule.regex.exec('#~ "alias'), 'malformed alias');
-            assert.ok(!rule.regex.exec('#~ alias"'), 'malformed alias2');
-            assert.ok(!rule.regex.exec('#~ <email'), 'malformed email');
-            assert.ok(!rule.regex.exec('#~ email>)'), 'malformed email2');
-            assert.ok(!rule.regex.exec('#~ (url'), 'malformed url');
-            assert.ok(!rule.regex.exec('#~ url)'), 'malformed url2');
-            assert.ok(!rule.regex.exec('#~ (scheme://url)'), 'unsupported scheme');
+            should.not.exist(rule.regex.exec('#~ "alias'), 'malformed alias');
+            should.not.exist(rule.regex.exec('#~ alias"'), 'malformed alias2');
+            should.not.exist(rule.regex.exec('#~ <email'), 'malformed email');
+            should.not.exist(rule.regex.exec('#~ email>)'), 'malformed email2');
+            should.not.exist(rule.regex.exec('#~ (url'), 'malformed url');
+            should.not.exist(rule.regex.exec('#~ url)'), 'malformed url2');
+            should.not.exist(rule.regex.exec('#~ (scheme://url)'), 'unsupported scheme');
         });
     });
 });
@@ -98,38 +96,50 @@ function basicAuthorshipRegexpTests(regexp, fields, withLeadingSpace = true)
         it('must have a match',
         function ()
         {
-            assert.ok(match);
+            should.exist(match);
         });
 
         it('must have 4 match groups',
         function ()
         {
-            assert.equal(4, match.length - 1);
+            match.length.should.equal(5);
         });
 
-        it('name group must have the correct value',
-        function ()
+        if (match[1])
         {
-            assert.equal(name, normalizeValue(match[1]));
-        });
+            it('name group must have the correct value',
+            function ()
+            {
+                match[1].should.equal(name);
+            });
+        }
 
-        it('alias group must have the correct value',
-        function ()
+        if (match[2])
         {
-            assert.equal(alias, normalizeValue(match[2]));
-        });
+            it('alias group must have the correct value',
+            function ()
+            {
+                match[2].should.equal(alias);
+            });
+        }
 
-        it('email group must have the correct value',
-        function ()
+        if (match[3])
         {
-            assert.equal(email, normalizeValue(match[3]));
-        });
+            it('email group must have the correct value',
+            function ()
+            {
+                match[3].should.equal(email);
+            });
+        }
 
-        it('url group must have the correct value',
-        function ()
+        if (match[4])
         {
-            assert.equal(url, normalizeValue(match[4]));
-        });
+            it('url group must have the correct value',
+            function ()
+            {
+                match[4].should.equal(url);
+            });
+        }
     });
 }
 
@@ -163,11 +173,5 @@ function buildDescription(withLeadingSpace, fields)
 {
     return 'must match "#~' + (withLeadingSpace ? ' ' : '')
            + Object.keys(fields).join(' ') + '"';
-}
-
-
-function normalizeValue(value)
-{
-    return value == '' ? undefined : value;
 }
 

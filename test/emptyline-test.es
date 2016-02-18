@@ -16,22 +16,20 @@
  */
 
 
-import assert from 'esaver';
-
-import {EMPTY_LINE} from '../src/constants';
+import {RULE_EMPTY_LINE} from '../src/rules';
 
 import * as fixtures from './fixtures';
 
 
-describe('EMPTY_LINE production rule',
+describe('RULE_EMPTY_LINE production rule',
 function ()
 {
-    const rule = EMPTY_LINE;
+    const rule = RULE_EMPTY_LINE;
 
     it('#groups must have the correct value',
     function ()
     {
-        assert.deepEqual([], rule.groups);
+        rule.groups.should.deep.equal([]);
     });
 
     describe('#regex',
@@ -40,13 +38,13 @@ function ()
         it('must match empty string',
         function ()
         {
-            assert.ok(rule.regex.test(fixtures.EMPTY));
+            rule.regex.test(fixtures.EMPTY).should.be.ok;
         });
 
-        it('must not match nom empty string',
+        it('must not match non empty string',
         function ()
         {
-            assert.ok(!rule.regex.test(fixtures.TEXT));
+            rule.regex.test(fixtures.TEXT).should.not.be.ok;
         });
     });
 });

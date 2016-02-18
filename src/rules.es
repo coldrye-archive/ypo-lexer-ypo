@@ -16,33 +16,23 @@
  */
 
 
-import {
-    OPTION_LANG, OPTION_NS, OPTION_PLURAL
-} from 'ypo-parser-common/constants';
+import {AUTHORSHIP} from 'ypo-parser-common/directives/authorship';
+import {OPTION_LANG, OPTION_NS} from 'ypo-parser-common/directives/option';
+import {QNAME} from 'ypo-parser-common/directives/context';
+import {CARDINALITY} from 'ypo-parser-common/directives/plural';
 
 
 /**
  * @private
  */
 // we must not validate email addresses or urls here
-export const REGEXP_AUTHORSHIP = new RegExp(
-    '^#~'
-    // name
-    + '\\s*((?:[^\\s"\'<(>)]+(?:\\s[^\\s"\'<(>)]+)*)?)'
-    // alias
-    + '\\s*(?:["\']((?:[^"]+)?)["\'])?'
-    // email address
-    + '\\s*(?:[<]((?:[^@]+@[^>]+)?)[>])?'
-    // url/homepage
-    + '\\s*(?:[(]((?:http[s]?://[^\\s]+)?)[)])?'
-    + '$'
-);
+export const REGEXP_AUTHORSHIP = new RegExp('^#~' + AUTHORSHIP + '$');
 
 
 /**
  * @private
  */
-export const AUTHORSHIP =
+export const RULE_AUTHORSHIP =
 {
     regex: REGEXP_AUTHORSHIP,
     groups: ['name', 'alias', 'email', 'url']
@@ -52,16 +42,32 @@ export const AUTHORSHIP =
 /**
  * @private
  */
-export const REGEXP_COMMENT = /^#\s?((?:(?:[^!~=@]).*)?)$/;
+export const REGEXP_COMMENT = /^#\s?((?:(?:[^!~=@+]).*)?)$/;
 
 
 /**
  * @private
  */
-export const COMMENT =
+export const RULE_COMMENT =
 {
     regex: REGEXP_COMMENT,
-    groups: ['comment']
+    groups: ['value']
+};
+
+
+/**
+ * @private
+ */
+export const REGEXP_CONTEXT = new RegExp('^#@\\s?(' + QNAME + ')$');
+
+
+/**
+ * @private
+ */
+export const RULE_CONTEXT =
+{
+    regex: REGEXP_CONTEXT,
+    groups: ['value']
 };
 
 
@@ -74,7 +80,7 @@ export const REGEXP_EMPTY_LINE = /^$/;
 /**
  * @private
  */
-export const EMPTY_LINE =
+export const RULE_EMPTY_LINE =
 {
     regex: REGEXP_EMPTY_LINE,
     groups: []
@@ -85,18 +91,17 @@ export const EMPTY_LINE =
  * @private
  */
 export const REGEXP_TRANSLATION_ID = new RegExp(
-    // id
-    '^#!\\s*([a-zA-Z_0-9$]+(?:[.][a-zA-Z_0-9$]+)*)'
+    '^#!\\s*(' + QNAME + ')\\s*$'
 );
 
 
 /**
  * @private
  */
-export const TRANSLATION_ID =
+export const RULE_TRANSLATION_ID =
 {
     regex: REGEXP_TRANSLATION_ID,
-    groups: ['id']
+    groups: ['value']
 };
 
 
@@ -107,7 +112,7 @@ export const REGEXP_OPTION = new RegExp(
     '^#=\\s*'
     // key
     + '('
-    + [OPTION_LANG, OPTION_NS, OPTION_PLURAL].join('|')
+    + [OPTION_LANG, OPTION_NS].join('|')
     + ')'
     // optional value will be validated later on
     + '(?:\\s+([^\\s]+))?'
@@ -118,7 +123,7 @@ export const REGEXP_OPTION = new RegExp(
 /**
  * @private
  */
-export const OPTION =
+export const RULE_OPTION =
 {
     regex: REGEXP_OPTION,
     groups: ['key', 'value']
@@ -128,15 +133,33 @@ export const OPTION =
 /**
  * @private
  */
-export const REGEXP_TEXT = /^((?:[\\]#)?[^#].*[\\]?)$/;
+export const REGEXP_TEXT = /^([^#].*)$/;
 
 
 /**
  * @private
  */
-export const TEXT =
+export const RULE_TEXT =
 {
     regex: REGEXP_TEXT,
-    groups: ['text']
+    groups: ['value']
+};
+
+
+/**
+ * @private
+ */
+export const REGEXP_PLURAL = new RegExp(
+    `^#[+]\\s*(${CARDINALITY})\\s*$`
+);
+
+
+/**
+ * @private
+ */
+export const RULE_PLURAL =
+{
+    regex: REGEXP_PLURAL,
+    groups: ['value']
 };
 

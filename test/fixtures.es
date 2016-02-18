@@ -46,7 +46,7 @@ export const WHITESPACE_PRESERVED = '   whitespace  must be preserved   ';
 export const TEST_ID = 'tid';
 
 
-export const TEST_ID_COMPLEX = '__tRan5.L_4T10n__';
+export const TEST_ID_COMPLEX = '__tRan5.L_4T1.0n__';
 
 
 export const TEST_ID_INVALID = '-1nv4l1D';
@@ -61,7 +61,7 @@ export const TID_INVALID = '#! ' + TEST_ID_INVALID;
 export const TID_NO_WS = '#!' + TEST_ID;
 
 
-export const TID_COMPLEX = '#! ' + TEST_ID_COMPLEX;
+export const TID_INVALID_COMPLEX = '#! ' + TEST_ID_COMPLEX;
 
 
 export const EMPTY_COMMENT = '#';

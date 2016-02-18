@@ -16,19 +16,21 @@
  */
 
 
-import assert from 'esaver';
-
-import {AbstractOption} from 'ypo-parser-common/option';
-import Authorship from 'ypo-parser-common/authorship';
-import Comment from 'ypo-parser-common/comment';
-import EmptyLine from 'ypo-parser-common/emptyline';
-import Text from 'ypo-parser-common/text';
-import TranslationId from 'ypo-parser-common/translationid';
+import
+{
+    Namespace, Lang
+} from 'ypo-parser-common/directives/option';
+import Authorship from 'ypo-parser-common/directives/authorship';
+import Comment from 'ypo-parser-common/directives/comment';
+import Context from 'ypo-parser-common/directives/context';
+import Plural from 'ypo-parser-common/directives/plural';
+import EmptyLine from 'ypo-parser-common/text/emptyline';
+import Line from 'ypo-parser-common/text/line';
+import TranslationId from 'ypo-parser-common/directives/translationid';
 import Location from 'ypo-parser-common/location';
 import ParseError from 'ypo-parser-common/exceptions';
 
 import Lexer from '../src/lexer';
-import {TOKENS} from '../src/lexer';
 
 import {TEST_FILE} from './fixtures';
 
@@ -45,66 +47,67 @@ function ()
         function ()
         {
             const gen = cut.tokenize();
-            assert.ok(typeof gen.next == 'function');
+            gen.next.should.be.a('function');
         });
 
         it('must fail on file=undefined',
         function ()
         {
-            assert.throws(
-            function ()
+            function tc()
             {
                 cut.tokenize().next();
-            }, TypeError);
+            }
+            tc.should.throw(TypeError, 'file must be a non empty string');
         });
 
         it('must fail on lines=undefined',
         function ()
         {
-            assert.throws(
-            function ()
+            function tc()
             {
                 cut.tokenize(TEST_FILE).next();
-            }, TypeError);
+            }
+            tc.should.throw(TypeError, 'lines must be an iterable');
         });
 
         it('must fail on non generator lines',
         function ()
         {
-            assert.throws(
-            function ()
+            function tc()
             {
                 cut.tokenize(TEST_FILE, {}).next();
-            }, TypeError);
+            }
+            tc.should.throw(TypeError, 'lines must be an iterable');
         });
 
         it('must stop iteration on empty iterable',
         function ()
         {
-            assert.deepEqual(
-                {value:null, done:true},
-                cut.tokenize(TEST_FILE, []).next()
-            );
+            cut.tokenize(TEST_FILE, []).next().should.deep.equal({
+                value:undefined, done:true
+            });
         });
 
         it('must fail on invalid input',
         function ()
         {
             const lines = [
-                '#=invalid option'
+                '#= invalid option'
             ];
 
-            assert.throws(
-            function ()
+            function tc()
             {
+                /*eslint no-unused-vars:0*/
                 for (const token of cut.tokenize(TEST_FILE, lines))
                 {
-                    assert.fail('failed to detect invalid input');
+                    throw new Error('failed to detect invalid input');
                 }
-            }, ParseError);
+            }
+            tc.should.throw(ParseError, 'ParseError: syntax error');
         });
 
-        describe('must return tokens in their expected order',
+        describe(
+        '#tokenize() must parse and return tokens in their original order',
         function ()
         {
             const testcases = [
@@ -112,12 +115,20 @@ function ()
                  location:new Location(TEST_FILE, 1)},
                 {line:'#! tid', class:TranslationId,
                  location:new Location(TEST_FILE, 2)},
-                {line:'text', class:Text,
+                {line:'text', class:Line,
                  location:new Location(TEST_FILE, 3)},
                 {line:'', class:EmptyLine,
                  location:new Location(TEST_FILE, 4)},
+                {line:'#@ context', class:Context,
+                 location:new Location(TEST_FILE, 5)},
                 {line:'#~ author', class:Authorship,
-                 location:new Location(TEST_FILE, 5)}
+                 location:new Location(TEST_FILE, 6)},
+                {line:'#= ns ui.config.general', class:Namespace,
+                 location:new Location(TEST_FILE, 7)},
+                {line:'#= lang en', class:Lang,
+                 location:new Location(TEST_FILE, 8)},
+                {line:'#+ inf', class:Plural,
+                 location:new Location(TEST_FILE, 9)}
             ];
 
             const lines = testcases.map(
@@ -131,16 +142,17 @@ function ()
             {
                 const klass = testcases[itemno].class;
                 const location = testcases[itemno].location;
-                it('instanceof ' + klass.name,
+
+                it(`token must be an instance of ${klass}`,
                 function ()
                 {
-                    assert.ok(token instanceof klass);
+                    token.should.be.an.instanceof(klass);
                 });
 
-                it('location ' + location,
+                it(`token must have expected location ${location}`,
                 function ()
                 {
-                    assert.deepEqual(location, token.location);
+                    token.location.should.deep.equal(location);
                 });
 
                 itemno++;

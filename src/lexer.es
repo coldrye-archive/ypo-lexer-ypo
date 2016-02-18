@@ -16,53 +16,67 @@
  */
 
 
-import AbstractLexer from 'ypo-parser-common/lexer';
-import {AbstractOption} from 'ypo-parser-common/option';
-import Authorship from 'ypo-parser-common/authorship';
-import Comment from 'ypo-parser-common/comment';
-import EmptyLine from 'ypo-parser-common/emptyline';
+import AbstractTokenizer from 'ypo-parser-common/tokenizer';
+import {AbstractOption} from 'ypo-parser-common/directives/option';
+import Authorship from 'ypo-parser-common/directives/authorship';
+import Comment from 'ypo-parser-common/directives/comment';
+import Context from 'ypo-parser-common/directives/context';
+import Plural from 'ypo-parser-common/directives/plural';
+import TranslationId from 'ypo-parser-common/directives/translationid';
+import EmptyLine from 'ypo-parser-common/text/emptyline';
+import Line from 'ypo-parser-common/text/line';
 import Location from 'ypo-parser-common/location';
 import ParseError from 'ypo-parser-common/exceptions';
-import Text from 'ypo-parser-common/text';
-import TranslationId from 'ypo-parser-common/translationid';
+import {isNonEmptyString} from 'ypo-parser-common/utils';
 
 import
 {
-    EMPTY_LINE, COMMENT, OPTION,
-    AUTHORSHIP, TRANSLATION_ID, TEXT
-} from './constants';
+    RULE_EMPTY_LINE, RULE_COMMENT, RULE_CONTEXT, RULE_PLURAL, RULE_OPTION,
+    RULE_AUTHORSHIP, RULE_TRANSLATION_ID, RULE_TEXT
+} from './rules';
 
 
 /**
  * @private
  */
-export const TOKENS = [
-    {rule:EMPTY_LINE, factory:EmptyLine.createNode},
-    {rule:COMMENT, factory:Comment.createNode},
-    {rule:OPTION, factory:AbstractOption.createNode},
-    {rule:AUTHORSHIP, factory:Authorship.createNode},
-    {rule:TRANSLATION_ID, factory:TranslationId.createNode},
-    {rule:TEXT, factory:Text.createNode}
+export const PRODUCTIONS = [
+    {rule:RULE_EMPTY_LINE, klass:EmptyLine},
+    {rule:RULE_COMMENT, klass:Comment},
+    {rule:RULE_CONTEXT, klass:Context},
+    {rule:RULE_PLURAL, klass:Plural},
+    {rule:RULE_OPTION, factory:AbstractOption.createNewInstance},
+    {rule:RULE_AUTHORSHIP, klass:Authorship},
+    {rule:RULE_TRANSLATION_ID, klass:TranslationId},
+    {rule:RULE_TEXT, klass:Line}
 ]
 
 
 /**
- * The class Lexer models a parser that produces a stream of tokens from a
+ * The class YpoLexer models a parser that produces a stream of tokens from a
  * stream of input lines.
+ *
+ * Note that the lexer does not make any assumptions on the correct order of
+ * the tokens. It is up to the parser to validate that order.
  */
-export default class Lexer extends AbstractLexer
+export default class YpoLexer extends AbstractTokenizer
 {
     /**
-     * Generates a stream of tokens from lines read from the input stream.
-     *
-     * @param {string} file - the absolute and resolved file name
-     * @param {Generator|Array<string>|Array<Buffer>} lines - the input line (buffer) stream or array
-     * @throws {ParseError}
-     * @returns {AbstractToken} - the yielded token instances
+     * @override
      */
     * tokenize(file, lines)
     {
-        assertParams(file, lines)
+        if (!isNonEmptyString(file))
+        {
+            throw new TypeError('file must be a non empty string');
+        }
+
+        if (
+            typeof lines == 'undefined'
+            || !Array.isArray(lines) && typeof lines.next != 'function'
+        )
+        {
+            throw new TypeError('lines must be an iterable');
+        }
 
         let lineno = 1;
         for (let line of lines)
@@ -72,60 +86,80 @@ export default class Lexer extends AbstractLexer
             // make sure that we are dealing with a string object here
             line = line.toString();
 
-            let token, rule, factory, match;
-            for (token of TOKENS)
-            {
-                rule = token.rule;
-                factory = token.factory;
-                match = rule.regex.exec(line);
-
-                if (match)
-                {
-                    break;
-                }
-            }
-
-            if (!match)
-            {
-                throw new ParseError(
-                    'error parsing file', {location: location}
-                );
-            }
-
-            const params = new Array(rule.groups.length);
-            for (let gidx = 0; gidx < rule.groups.length; gidx++)
-            {
-                params[gidx] = match[1 + gidx];
-            }
-
-            yield factory(location, ...params);
+            yield this.nextToken(line, location);
 
             lineno++;
         }
     }
-}
 
-
-/**
- * @private
- * @param {string} file - the absolute and resolved file name
- * @param {Generator|Array<string>} lines - the input line (buffer) stream or array
- * @returns {void}
- * @throws TypeError in case of invalid arguments
- */
-function assertParams(file, lines)
-{
-    if (typeof file != 'string' || file.length == 0)
+    nextToken(line, location)
     {
-        throw new TypeError('MSG_file must be a non empty string');
+        let production, match;
+        for (production of PRODUCTIONS)
+        {
+            match = production.rule.regex.exec(line);
+
+            if (match)
+            {
+                break;
+            }
+        }
+
+        if (!match)
+        {
+            this.doFail(null, location, line);
+        }
+
+        const options = {};
+        for (let gidx = 0; gidx < production.rule.groups.length; gidx++)
+        {
+            options[production.rule.groups[gidx]] = match[1 + gidx];
+        }
+
+        let result;
+
+        try
+        {
+            if (production.klass)
+            {
+                result = new production.klass(location, options);
+            }
+            else
+            {
+                result = production.factory.apply(null, [location, options]);
+            }
+        }
+        catch (error)
+        {
+            this.doFail(error, location, line, production.klass);
+        }
+
+        return result;
     }
 
-    if (
-        typeof lines == 'undefined'
-        || !Array.isArray(lines) && typeof lines.next != 'function'
-    )
+    doFail(cause, location, line, klass)
     {
-        throw new TypeError('MSG_lines must be an iterable');
+        // handle expected syntax errors
+        if (
+            !klass
+            || klass instanceof AbstractOption
+            || klass instanceof Authorship
+            || klass instanceof Context
+            || klass instanceof Plural
+            || klass instanceof TranslationId
+        )
+        {
+            throw new ParseError(
+                'syntax error', {location, line, cause}
+            );
+        }
+        else
+        {
+            /*istanbul ignore next*/
+            throw new ParseError(
+                'internal error', {location, line, cause}
+            );
+        }
     }
 }
 

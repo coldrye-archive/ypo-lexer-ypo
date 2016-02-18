@@ -16,27 +16,29 @@
  */
 
 
-import assert from 'esaver';
+import {DIRECTIVE_AUTHORSHIP} from 'ypo-parser-common/directives/authorship';
+import {DIRECTIVE_CONTEXT} from 'ypo-parser-common/directives/context';
+import {DIRECTIVE_OPTION} from 'ypo-parser-common/directives/option';
+import {DIRECTIVE_PLURAL} from 'ypo-parser-common/directives/plural';
+import
+{
+    DIRECTIVE_TRANSLATION_ID
+} from 'ypo-parser-common/directives/translationid';
 
-import {
-    DIRECTIVE_COMMENT, DIRECTIVE_AUTHORSHIP, DIRECTIVE_CONTEXT,
-    DIRECTIVE_TRANSLATION_ID, DIRECTIVE_OPTION
-} from 'ypo-parser-common/constants';
-
-import {COMMENT} from '../src/constants';
+import {RULE_COMMENT} from '../src/rules';
 
 import * as fixtures from './fixtures';
 
 
-describe('COMMENT production rule',
+describe('RULE_COMMENT production rule',
 function ()
 {
-    const rule = COMMENT;
+    const rule = RULE_COMMENT;
 
     it('#groups must have the correct value',
     function ()
     {
-        assert.deepEqual(['comment'], rule.groups);
+        rule.groups.should.deep.equal(['value']);
     });
 
     describe('#regex',
@@ -45,44 +47,45 @@ function ()
         it('must match empty comment',
         function ()
         {
-            assert.ok(rule.regex.test(fixtures.EMPTY_COMMENT));
+            rule.regex.test(fixtures.EMPTY_COMMENT).should.be.ok;
         });
 
         it('must match comment',
         function ()
         {
-            assert.ok(rule.regex.test(fixtures.COMMENT));
+            rule.regex.test(fixtures.COMMENT).should.be.ok;
         });
 
         it('must match comment w/o whitespace',
         function ()
         {
-            assert.ok(rule.regex.test(fixtures.COMMENT_NO_WS));
+            rule.regex.test(fixtures.COMMENT_NO_WS).should.be.ok;
         });
 
         it('must not match other directives',
         function ()
         {
-            assert.ok(!rule.regex.test(DIRECTIVE_AUTHORSHIP));
-            assert.ok(!rule.regex.test(DIRECTIVE_OPTION));
-            assert.ok(!rule.regex.test(DIRECTIVE_CONTEXT));
-            assert.ok(!rule.regex.test(DIRECTIVE_TRANSLATION_ID));
+            rule.regex.test(DIRECTIVE_AUTHORSHIP).should.not.be.ok;
+            rule.regex.test(DIRECTIVE_CONTEXT).should.not.be.ok;
+            rule.regex.test(DIRECTIVE_OPTION).should.not.be.ok;
+            rule.regex.test(DIRECTIVE_PLURAL).should.not.be.ok;
+            rule.regex.test(DIRECTIVE_TRANSLATION_ID).should.not.be.ok;
         });
 
         it('must have the expected groups for non empty comments',
         function ()
         {
             const matches = rule.regex.exec(fixtures.COMMENT);
-            assert.equal(2, matches.length);
-            assert.equal(fixtures.TEXT, matches[1]);
+            matches.length.should.equal(2);
+            matches[1].should.equal(fixtures.TEXT);
         });
 
         it('must have the expected groups for empty comments',
         function ()
         {
             const matches = rule.regex.exec(fixtures.EMPTY_COMMENT);
-            assert.equal(2, matches.length);
-            assert.equal(fixtures.EMPTY, matches[1]);
+            matches.length.should.equal(2);
+            matches[1].should.equal(fixtures.EMPTY);
         });
     });
 });

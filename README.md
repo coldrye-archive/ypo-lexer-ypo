@@ -3,6 +3,12 @@
 
 # ypo-lexer-ypo
 
+ypo-lexer-ypo is a lexer for the YPO file format that procudes a token stream for consumption by for example the ypo parser.
+The lexer is rather dumb and does not validate the correct order of the input tokens.
+
+You might want to have a look at [ypo-cli](https://github.com/coldrye-es/ypo-cli.git) instead and see how
+it can help you with your translations.
+
 
 ## Releases
 
@@ -25,7 +31,7 @@ See the [contributing guidelines](https://github.com/coldrye-es/ypo-lexer-ypo/bl
 
 ### Contributors
 
- - [Carsten Klein](https://github.com/silkentrance) **Maintainer**
+See [contributors](https://github.com/coldrye-es/ypo-lexer-ypo/graphs/contributors) for more information.
 
 
 ### Building
