@@ -30,15 +30,15 @@ import TranslationId from 'ypo-parser-common/directives/translationid';
 import Location from 'ypo-parser-common/location';
 import ParseError from 'ypo-parser-common/exceptions';
 
-import Lexer from '../src/lexer';
+import YpoLexer from '../src/lexer';
 
 import {TEST_FILE} from './fixtures';
 
 
-describe('Lexer',
+describe('YpoLexer',
 function ()
 {
-    const cut = new Lexer();
+    const cut = new YpoLexer();
 
     describe('#tokenize()',
     function ()
