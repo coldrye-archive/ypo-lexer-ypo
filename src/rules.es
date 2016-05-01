@@ -42,7 +42,8 @@ export const RULE_AUTHORSHIP =
 /**
  * @private
  */
-export const REGEXP_COMMENT = /^#\s?((?:(?:[^!~=@+]).*)?)$/;
+export const REGEXP_COMMENT = /^#(?:[^!~=@+]\s*(.*))?$/;
+//((?:(?:[^!~=@+]).*)?)$/;
 
 
 /**

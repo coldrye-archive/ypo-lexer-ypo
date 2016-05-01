@@ -85,7 +85,7 @@ function ()
         {
             const matches = rule.regex.exec(fixtures.EMPTY_COMMENT);
             matches.length.should.equal(2);
-            matches[1].should.equal(fixtures.EMPTY);
+            should.not.exist(matches[1]);
         });
     });
 });

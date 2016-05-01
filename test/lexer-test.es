@@ -21,10 +21,10 @@ import
     Namespace, Lang
 } from 'ypo-parser-common/directives/option';
 import Authorship from 'ypo-parser-common/directives/authorship';
-import Comment from 'ypo-parser-common/directives/comment';
+import Comment from 'ypo-parser-common/tokens/comment';
 import Context from 'ypo-parser-common/directives/context';
 import Plural from 'ypo-parser-common/directives/plural';
-import EmptyLine from 'ypo-parser-common/text/emptyline';
+import EmptyLine from 'ypo-parser-common/tokens/emptyline';
 import Line from 'ypo-parser-common/text/line';
 import TranslationId from 'ypo-parser-common/directives/translationid';
 import Location from 'ypo-parser-common/location';
