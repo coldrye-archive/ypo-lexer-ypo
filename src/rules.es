@@ -134,15 +134,15 @@ export const RULE_OPTION =
 /**
  * @private
  */
-export const REGEXP_TEXT = /^([^#].*)$/;
+export const REGEXP_LINE = /^([^#].*)$/;
 
 
 /**
  * @private
  */
-export const RULE_TEXT =
+export const RULE_LINE =
 {
-    regex: REGEXP_TEXT,
+    regex: REGEXP_LINE,
     groups: ['value']
 };
 
