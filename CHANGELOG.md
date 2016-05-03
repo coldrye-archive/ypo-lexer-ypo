@@ -1,3 +1,22 @@
+<a name="0.0.4"></a>
+## [0.0.4](https://github.com/coldrye-es/ypo-lexer-ypo/compare/v0.0.3...v0.0.4) (2016-05-03)
+
+
+* version bump v0.0.4([669d900](https://github.com/coldrye-es/ypo-lexer-ypo/commit/669d900))
+
+
+### Chores
+
+* **dependencies:** add dependency conventional-changelog-coldrye([e22646a](https://github.com/coldrye-es/ypo-lexer-ypo/commit/e22646a))
+
+
+### Code Refactoring
+
+* **text:** refactor to line([ed8c775](https://github.com/coldrye-es/ypo-lexer-ypo/commit/ed8c775))
+* **YpoLexer:** make it compatible to the ypo-parser-common/tokenizer API([51c227e](https://github.com/coldrye-es/ypo-lexer-ypo/commit/51c227e))
+
+
+
 <a name="0.0.3"></a>
 ## [0.0.3](https://github.com/coldrye-es/ypo-lexer-ypo/compare/v0.0.2...v0.0.3) (2016-05-01)
 
