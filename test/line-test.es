@@ -16,15 +16,15 @@
  */
 
 
-import {RULE_TEXT} from '../src/rules';
+import {RULE_LINE} from '../src/rules';
 
 import * as fixtures from './fixtures';
 
 
-describe('TEXT production rule',
+describe('LINE production rule',
 function ()
 {
-    const rule = RULE_TEXT;
+    const rule = RULE_LINE;
 
     it('#groups must have the correct value',
     function ()

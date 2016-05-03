@@ -38,56 +38,35 @@ import {TEST_FILE} from './fixtures';
 describe('YpoLexer',
 function ()
 {
-    const cut = new YpoLexer();
+    it('must fail on invalid file',
+    function ()
+    {
+        function tc()
+        {
+            new YpoLexer();
+        }
+        tc.should.throw(TypeError, 'file must be a non empty string');
+    });
+
+    it('must fail on invalid lines iterable',
+    function ()
+    {
+        function tc1()
+        {
+            new YpoLexer(TEST_FILE);
+        }
+        tc1.should.throw(TypeError, 'lines must be an iterable');
+
+        function tc2()
+        {
+            new YpoLexer(TEST_FILE, {});
+        }
+        tc2.should.throw(TypeError, 'lines must be an iterable');
+    });
 
     describe('#tokenize()',
     function ()
     {
-        it('must return generator',
-        function ()
-        {
-            const gen = cut.tokenize();
-            gen.next.should.be.a('function');
-        });
-
-        it('must fail on file=undefined',
-        function ()
-        {
-            function tc()
-            {
-                cut.tokenize().next();
-            }
-            tc.should.throw(TypeError, 'file must be a non empty string');
-        });
-
-        it('must fail on lines=undefined',
-        function ()
-        {
-            function tc()
-            {
-                cut.tokenize(TEST_FILE).next();
-            }
-            tc.should.throw(TypeError, 'lines must be an iterable');
-        });
-
-        it('must fail on non generator lines',
-        function ()
-        {
-            function tc()
-            {
-                cut.tokenize(TEST_FILE, {}).next();
-            }
-            tc.should.throw(TypeError, 'lines must be an iterable');
-        });
-
-        it('must stop iteration on empty iterable',
-        function ()
-        {
-            cut.tokenize(TEST_FILE, []).next().should.deep.equal({
-                value:undefined, done:true
-            });
-        });
-
         it('must fail on invalid input',
         function ()
         {
@@ -97,8 +76,9 @@ function ()
 
             function tc()
             {
-                /*eslint no-unused-vars:0*/
-                for (const token of cut.tokenize(TEST_FILE, lines))
+                const cut = new YpoLexer(TEST_FILE, lines);
+
+                for (const token of cut.tokenize())
                 {
                     throw new Error('failed to detect invalid input');
                 }
@@ -137,8 +117,9 @@ function ()
                 return item.line;
             });
 
+            const cut = new YpoLexer(TEST_FILE, lines);
             let itemno = 0;
-            for (const token of cut.tokenize(TEST_FILE, lines))
+            for (const token of cut.tokenize())
             {
                 const klass = testcases[itemno].class;
                 const location = testcases[itemno].location;

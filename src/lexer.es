@@ -32,7 +32,7 @@ import {isNonEmptyString} from 'ypo-parser-common/utils';
 import
 {
     RULE_EMPTY_LINE, RULE_COMMENT, RULE_CONTEXT, RULE_PLURAL, RULE_OPTION,
-    RULE_AUTHORSHIP, RULE_TRANSLATION_ID, RULE_TEXT
+    RULE_AUTHORSHIP, RULE_TRANSLATION_ID, RULE_LINE
 } from './rules';
 
 
@@ -47,41 +47,49 @@ export const PRODUCTIONS = [
     {rule:RULE_OPTION, factory:AbstractOption.createNewInstance},
     {rule:RULE_AUTHORSHIP, klass:Authorship},
     {rule:RULE_TRANSLATION_ID, klass:TranslationId},
-    {rule:RULE_TEXT, klass:Line}
+    {rule:RULE_LINE, klass:Line}
 ]
 
 
 /**
  * The class YpoLexer models a parser that produces a stream of tokens from a
  * stream of input lines.
- *
- * Note that the lexer does not make any assumptions on the correct order of
- * the tokens. It is up to the parser to validate that order.
  */
 export default class YpoLexer extends AbstractTokenizer
 {
-    /**
-     * @override
-     */
-    * tokenize(file, lines)
+    constructor(file, lines)
     {
+        super();
+
         if (!isNonEmptyString(file))
         {
             throw new TypeError('file must be a non empty string');
         }
 
+        this._file = file;
+
         if (
-            typeof lines == 'undefined'
-            || !Array.isArray(lines) && typeof lines.next != 'function'
+            lines === null || typeof lines == 'undefined'
+            || (!Array.isArray(lines) && typeof lines.next != 'function')
         )
         {
-            throw new TypeError('lines must be an iterable');
+            throw new TypeError(
+                `lines must be an iterable or undefined, got ${typeof lines}`
+            );
         }
 
+        this._lines = lines;
+    }
+
+    /**
+     * @override
+     */
+    * tokenize()
+    {
         let lineno = 1;
-        for (let line of lines)
+        for (let line of this._lines)
         {
-            const location = new Location(file, lineno);
+            const location = new Location(this._file, lineno);
 
             // make sure that we are dealing with a string object here
             line = line.toString();
