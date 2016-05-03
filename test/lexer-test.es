@@ -78,9 +78,12 @@ function ()
             {
                 const cut = new YpoLexer(TEST_FILE, lines);
 
+                /*eslint no-unused-vars:0*/
                 for (const token of cut.tokenize())
                 {
-                    throw new Error('failed to detect invalid input');
+                    throw new Error(
+                        'failed to detect invalid input'
+                    );
                 }
             }
             tc.should.throw(ParseError, 'ParseError: syntax error');

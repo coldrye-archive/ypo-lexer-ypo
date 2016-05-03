@@ -70,7 +70,7 @@ export default class YpoLexer extends AbstractTokenizer
 
         if (
             lines === null || typeof lines == 'undefined'
-            || (!Array.isArray(lines) && typeof lines.next != 'function')
+            || !Array.isArray(lines) && typeof lines.next != 'function'
         )
         {
             throw new TypeError(
